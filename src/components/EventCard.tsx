@@ -1,29 +1,55 @@
 import React from 'react';
 import {Text, View} from 'react-native';
-import {DataTable} from 'react-native-paper';
-import {convertedDataType, id} from '../utils/types';
+import {data, id} from '../utils/types';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {SharedValue, runOnJS} from 'react-native-reanimated';
 
 type EventCardPropsType = {
-  currentIds: id[];
-  convertedData: convertedDataType | null;
+  currentTask: data | undefined;
+  setActiveItem: React.Dispatch<React.SetStateAction<id | undefined>>;
+  activeItemPoistion: SharedValue<{
+    x: number;
+    y: number;
+  }>;
 };
 
 const EventCard = (props: EventCardPropsType) => {
+  const {currentTask, setActiveItem, activeItemPoistion} = props;
+
+  const PanGesture = Gesture.Pan()
+    .onBegin(({absoluteX, absoluteY}) => {
+      runOnJS(setActiveItem)(currentTask?.id);
+      activeItemPoistion.value = {
+        x: absoluteX,
+        y: absoluteY,
+      };
+    })
+    .onChange(({absoluteX, absoluteY, changeX, changeY}) => {
+      activeItemPoistion.value = {
+        x: absoluteX + changeX,
+        y: absoluteY + changeY,
+      };
+    })
+    .onFinalize(() => {
+      runOnJS(setActiveItem)(undefined);
+    });
+
   return (
-    <>
-      <DataTable.Cell style={{width: 200}}>
-        <View style={{gap: 10}}>
-          {props?.currentIds?.map(ids => {
-            const currentData = props?.convertedData?.collection[ids];
-            return (
-              <View key={ids} style={{borderWidth: 1, padding: 10}}>
-                <Text>{currentData?.title.slice(0, 25)}</Text>
-              </View>
-            );
-          })}
+    currentTask && (
+      <GestureDetector gesture={PanGesture}>
+        <View id={currentTask?.id.toString()}>
+          <View
+            key={currentTask?.id}
+            style={{
+              width: 100,
+              alignItems: 'center',
+              backgroundColor: 'red',
+            }}>
+            <Text>{currentTask?.title}</Text>
+          </View>
         </View>
-      </DataTable.Cell>
-    </>
+      </GestureDetector>
+    )
   );
 };
 

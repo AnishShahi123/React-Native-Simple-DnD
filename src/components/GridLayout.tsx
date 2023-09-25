@@ -1,13 +1,18 @@
 import React from 'react';
-import {ScrollView, Text, View} from 'react-native';
-import {DataTable} from 'react-native-paper';
 import {convertDataToIdsAndCollection} from '../utils/convertDataToIdAndCollection';
 import MOCK_DATA from '../mockData/MOCK_DATA.json';
 import {getStructuredData} from '../utils/getStructuredData';
-import {convertedDataType, structuredDataType} from '../utils/types';
+import {convertedDataType, id, structuredDataType} from '../utils/types';
 import {getWeekDates} from '../utils/getWeekDates';
 import {DateTime} from 'luxon';
-import TableHeader from './TableHeader';
+import {ScrollView, Text, View} from 'react-native';
+
+import GridCell from './GridCell';
+import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import EventCard from './EventCard';
 
 const GridLayout = () => {
@@ -41,35 +46,89 @@ const GridLayout = () => {
     }
     initialMethods();
   }, [convertedData]);
+
+  //active item contains the id of the task which is being dragged
+  const [activeItem, setActiveItem] = React.useState<undefined | id>(undefined);
+
+  const [heightOfEachRow, setHeightOfEachRow] = React.useState<{
+    [key: string]: {
+      y1: number;
+      y2: number;
+    };
+  }>({});
+
+  const activeItemPoistion = useSharedValue({
+    x: 0,
+    y: 0,
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {translateX: activeItemPoistion.value.x},
+        {translateY: activeItemPoistion.value.y},
+      ],
+      position: 'absolute',
+    };
+  });
+
+  React.useEffect(() => {
+    console.log(activeItem);
+  }, [activeItem]);
+
   return (
-    <ScrollView>
-      <ScrollView horizontal={true}>
-        <DataTable>
-          <TableHeader getWeekDatesData={getWeekDatesData} />
-          {Array.from({length: 24}).map((value, index) => {
-            return (
-              <DataTable.Row key={index}>
-                <DataTable.Cell style={{width: 50}}>
-                  {index.toString().padStart(2, '0').padEnd(5, ':00')}
-                </DataTable.Cell>
-                {getWeekDatesData?.map(date => {
-                  const containerId = `${date.day}-${index}`;
-                  if (!structuredData) return;
-                  const currentIds = structuredData[containerId];
-                  return (
-                    <EventCard
-                      key={containerId}
-                      currentIds={currentIds}
-                      convertedData={convertedData}
-                    />
-                  );
-                })}
-              </DataTable.Row>
-            );
-          })}
-        </DataTable>
-      </ScrollView>
-    </ScrollView>
+    structuredData && (
+      <>
+        {activeItem && (
+          <Animated.View style={[animatedStyle, {zIndex: 100}]}>
+            <EventCard
+              currentTask={convertedData?.collection[activeItem]}
+              setActiveItem={setActiveItem}
+              activeItemPoistion={activeItemPoistion}
+            />
+          </Animated.View>
+        )}
+        <ScrollView horizontal>
+          <ScrollView>
+            {Array.from({length: 5}).map((item, index) => {
+              return (
+                <View
+                  style={{flexDirection: 'row'}}
+                  key={index}
+                  onLayout={({nativeEvent}) => {
+                    const y1 = nativeEvent.layout.y;
+                    const y2 = nativeEvent.layout.y + nativeEvent.layout.height;
+                    setHeightOfEachRow(oldState => {
+                      return {
+                        ...oldState,
+                        [index]: {
+                          y1,
+                          y2,
+                        },
+                      };
+                    });
+                  }}>
+                  {getWeekDatesData.map(date => {
+                    const currentGridId = `${date.day}-${index}`;
+                    const currentCellTasksId = structuredData[currentGridId];
+                    return (
+                      <GridCell
+                        setActiveItem={setActiveItem}
+                        key={currentGridId}
+                        currentCellTasksId={currentCellTasksId}
+                        convertedData={convertedData}
+                        currentGridId={currentGridId}
+                        activeItemPoistion={activeItemPoistion}
+                      />
+                    );
+                  })}
+                </View>
+              );
+            })}
+          </ScrollView>
+        </ScrollView>
+      </>
+    )
   );
 };
 
