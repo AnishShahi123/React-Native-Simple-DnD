@@ -5,10 +5,8 @@ import {getStructuredData} from '../utils/getStructuredData';
 import {convertedDataType, id, structuredDataType} from '../utils/types';
 import {getWeekDates} from '../utils/getWeekDates';
 import {DateTime} from 'luxon';
-import {ScrollView, Text, View} from 'react-native';
-
+import {ScrollView, View} from 'react-native';
 import GridCell from './GridCell';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -76,12 +74,28 @@ const GridLayout = () => {
     console.log(activeItem);
   }, [activeItem]);
 
+  //For Column
+  const [activeItemOverCell, setActiveItemOverCell] = React.useState<
+    | undefined
+    | {
+        row: number;
+        column: number;
+      }
+  >(undefined);
+
+  const activeItemOverCellPosition = useSharedValue({
+    row: 0,
+    column: 0,
+  });
+
   return (
     structuredData && (
       <>
         {activeItem && (
           <Animated.View style={[animatedStyle, {zIndex: 100}]}>
             <EventCard
+              setActiveItemOverCell={setActiveItemOverCell}
+              activeItemOverCellPosition={activeItemOverCellPosition}
               currentTask={convertedData?.collection[activeItem]}
               setActiveItem={setActiveItem}
               activeItemPoistion={activeItemPoistion}
@@ -90,7 +104,7 @@ const GridLayout = () => {
         )}
         <ScrollView horizontal>
           <ScrollView>
-            {Array.from({length: 5}).map((item, index) => {
+            {Array.from({length: 24}).map((item, index) => {
               return (
                 <View
                   style={{flexDirection: 'row'}}
@@ -113,6 +127,8 @@ const GridLayout = () => {
                     const currentCellTasksId = structuredData[currentGridId];
                     return (
                       <GridCell
+                        setActiveItemOverCell={setActiveItemOverCell}
+                        activeItemOverCellPosition={activeItemOverCellPosition}
                         setActiveItem={setActiveItem}
                         key={currentGridId}
                         currentCellTasksId={currentCellTasksId}

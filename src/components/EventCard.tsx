@@ -11,10 +11,29 @@ type EventCardPropsType = {
     x: number;
     y: number;
   }>;
+  setActiveItemOverCell: React.Dispatch<
+    React.SetStateAction<
+      | {
+          row: number;
+          column: number;
+        }
+      | undefined
+    >
+  >;
+  activeItemOverCellPosition: SharedValue<{
+    row: number;
+    column: number;
+  }>;
 };
 
 const EventCard = (props: EventCardPropsType) => {
-  const {currentTask, setActiveItem, activeItemPoistion} = props;
+  const {
+    currentTask,
+    setActiveItem,
+    activeItemPoistion,
+    activeItemOverCellPosition,
+    setActiveItemOverCell,
+  } = props;
 
   const PanGesture = Gesture.Pan()
     .onBegin(({absoluteX, absoluteY}) => {
@@ -23,15 +42,32 @@ const EventCard = (props: EventCardPropsType) => {
         x: absoluteX,
         y: absoluteY,
       };
+      activeItemOverCellPosition.value = {
+        row: 0,
+        column: Math.floor(activeItemPoistion.value.x / 150),
+      };
+      console.log(
+        `Current Column: ${Math.floor(activeItemPoistion.value.x / 150)}`,
+      );
     })
     .onChange(({absoluteX, absoluteY, changeX, changeY}) => {
       activeItemPoistion.value = {
         x: absoluteX + changeX,
         y: absoluteY + changeY,
       };
+      activeItemOverCellPosition.value = {
+        row: 0,
+        column: Math.floor(activeItemPoistion.value.x / 150),
+      };
+      console.log(
+        `New Column: ${Math.floor(activeItemPoistion.value.x / 150)}`,
+      );
     })
     .onFinalize(() => {
       runOnJS(setActiveItem)(undefined);
+
+      const newPosition = activeItemPoistion.value;
+      console.log(newPosition);
     });
 
   return (
@@ -40,12 +76,21 @@ const EventCard = (props: EventCardPropsType) => {
         <View id={currentTask?.id.toString()}>
           <View
             key={currentTask?.id}
+            // eslint-disable-next-line react-native/no-inline-styles
             style={{
-              width: 100,
+              flexDirection: 'row',
+              width: 120,
+              height: 32,
               alignItems: 'center',
-              backgroundColor: 'red',
+              backgroundColor: 'rgba(126, 136, 146, 1)',
+              borderRadius: 18,
+              justifyContent: 'center',
             }}>
-            <Text>{currentTask?.title}</Text>
+            <Text
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{color: 'white', fontSize: 12}}>
+              {currentTask?.title}
+            </Text>
           </View>
         </View>
       </GestureDetector>

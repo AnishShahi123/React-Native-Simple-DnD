@@ -13,18 +13,34 @@ type PropTypes = {
     x: number;
     y: number;
   }>;
+  setActiveItemOverCell: React.Dispatch<
+    React.SetStateAction<
+      | {
+          row: number;
+          column: number;
+        }
+      | undefined
+    >
+  >;
+  activeItemOverCellPosition: SharedValue<{
+    row: number;
+    column: number;
+  }>;
 };
 
 export default function GridCell({
   currentCellTasksId,
   convertedData,
-  currentGridId,
+  // currentGridId,
+  setActiveItemOverCell,
   setActiveItem,
   activeItemPoistion,
+  activeItemOverCellPosition,
 }: PropTypes) {
   return (
     <View
       id={currentCellTasksId?.toString()}
+      // eslint-disable-next-line react-native/no-inline-styles
       style={{
         borderTopWidth: 1,
         justifyContent: 'center',
@@ -33,11 +49,15 @@ export default function GridCell({
         width: 150,
         // overflow: 'hidden',
       }}>
-      <View style={{gap: 10, paddingVertical: 10}}>
+      <View
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{gap: 10, paddingVertical: 10}}>
         {currentCellTasksId?.map(currentTaskId => {
           const currentTask = convertedData?.collection[currentTaskId];
           return (
             <EventCard
+              setActiveItemOverCell={setActiveItemOverCell}
+              activeItemOverCellPosition={activeItemOverCellPosition}
               currentTask={currentTask}
               key={currentTask?.id}
               setActiveItem={setActiveItem}
