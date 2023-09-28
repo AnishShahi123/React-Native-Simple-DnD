@@ -91,9 +91,10 @@ const GridLayout = () => {
   return (
     structuredData && (
       <>
-        {activeItem && (
+        {/* {activeItem && (
           <Animated.View style={[animatedStyle, {zIndex: 100}]}>
             <EventCard
+              activeItem={activeItem}
               setActiveItemOverCell={setActiveItemOverCell}
               activeItemOverCellPosition={activeItemOverCellPosition}
               currentTask={convertedData?.collection[activeItem]}
@@ -101,10 +102,10 @@ const GridLayout = () => {
               activeItemPoistion={activeItemPoistion}
             />
           </Animated.View>
-        )}
+        )} */}
         <ScrollView horizontal>
           <ScrollView>
-            {Array.from({length: 24}).map((item, index) => {
+            {Array.from({length: 10}).map((item, index) => {
               return (
                 <View
                   style={{flexDirection: 'row'}}
@@ -127,6 +128,7 @@ const GridLayout = () => {
                     const currentCellTasksId = structuredData[currentGridId];
                     return (
                       <GridCell
+                        activeItem={activeItem}
                         setActiveItemOverCell={setActiveItemOverCell}
                         activeItemOverCellPosition={activeItemOverCellPosition}
                         setActiveItem={setActiveItem}

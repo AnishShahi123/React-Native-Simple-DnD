@@ -26,6 +26,7 @@ type PropTypes = {
     row: number;
     column: number;
   }>;
+  activeItem: id | undefined;
 };
 
 export default function GridCell({
@@ -36,6 +37,7 @@ export default function GridCell({
   setActiveItem,
   activeItemPoistion,
   activeItemOverCellPosition,
+  activeItem,
 }: PropTypes) {
   return (
     <View
@@ -56,6 +58,7 @@ export default function GridCell({
           const currentTask = convertedData?.collection[currentTaskId];
           return (
             <EventCard
+              activeItem={activeItem}
               setActiveItemOverCell={setActiveItemOverCell}
               activeItemOverCellPosition={activeItemOverCellPosition}
               currentTask={currentTask}
