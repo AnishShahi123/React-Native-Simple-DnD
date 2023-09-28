@@ -20,7 +20,14 @@ type PropTypes = {
       }
     | undefined
   >;
-  scrollViewOffsetValue: SharedValue<number>;
+  scrollViewHorizontalOffsetValue: SharedValue<number>;
+  scrollViewVerticalOffsetValue: SharedValue<number>;
+  heightOfEachRow: {
+    [key: string]: {
+      y1: number;
+      y2: number;
+    };
+  };
 };
 
 export default function GridCell({
@@ -30,7 +37,9 @@ export default function GridCell({
   activeItem,
   activeItemOverCell,
   activeItemPoistion,
-  scrollViewOffsetValue,
+  scrollViewHorizontalOffsetValue,
+  heightOfEachRow,
+  scrollViewVerticalOffsetValue,
 }: PropTypes) {
   return (
     <View
@@ -41,7 +50,6 @@ export default function GridCell({
         borderRightWidth: 1,
         alignItems: 'center',
         width: 150,
-        // overflow: 'hidden',
       }}>
       <View style={{gap: 10, paddingVertical: 10}}>
         {currentCellTasksId?.map(currentTaskId => {
@@ -53,7 +61,9 @@ export default function GridCell({
               key={currentTask?.id}
               activeItem={activeItem}
               activeItemPoistion={activeItemPoistion}
-              scrollViewOffsetValue={scrollViewOffsetValue}
+              scrollViewHorizontalOffsetValue={scrollViewHorizontalOffsetValue}
+              heightOfEachRow={heightOfEachRow}
+              scrollViewVerticalOffsetValue={scrollViewVerticalOffsetValue}
             />
           );
         })}

@@ -70,7 +70,8 @@ const GridLayout = () => {
       }
   >(undefined);
 
-  const scrollViewOffsetValue = useSharedValue(0);
+  const scrollViewHorizontalOffsetValue = useSharedValue(0);
+  const scrollViewVerticalOffsetValue = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -81,6 +82,10 @@ const GridLayout = () => {
       position: 'absolute',
     };
   });
+
+  React.useEffect(() => {
+    console.log(heightOfEachRow);
+  }, [heightOfEachRow]);
 
   return (
     structuredData && (
@@ -94,16 +99,23 @@ const GridLayout = () => {
               activeItemOverCell={activeItemOverCell}
               currentTask={convertedData?.collection[activeItem.value]}
               activeItemPoistion={activeItemPoistion}
-              scrollViewOffsetValue={scrollViewOffsetValue}
+              scrollViewHorizontalOffsetValue={scrollViewHorizontalOffsetValue}
+              heightOfEachRow={heightOfEachRow}
+              scrollViewVerticalOffsetValue={scrollViewVerticalOffsetValue}
             />
           </Animated.View>
         )}
         <ScrollView
           horizontal
           onScroll={event => {
-            scrollViewOffsetValue.value = event.nativeEvent.contentOffset.x;
+            scrollViewHorizontalOffsetValue.value =
+              event.nativeEvent.contentOffset.x;
           }}>
-          <ScrollView>
+          <ScrollView
+            onScroll={event => {
+              scrollViewVerticalOffsetValue.value =
+                event.nativeEvent.contentOffset.y;
+            }}>
             {Array.from({length: 5}).map((item, index) => {
               return (
                 <View
@@ -134,7 +146,13 @@ const GridLayout = () => {
                         currentGridId={currentGridId}
                         activeItemPoistion={activeItemPoistion}
                         activeItem={activeItem}
-                        scrollViewOffsetValue={scrollViewOffsetValue}
+                        scrollViewHorizontalOffsetValue={
+                          scrollViewHorizontalOffsetValue
+                        }
+                        heightOfEachRow={heightOfEachRow}
+                        scrollViewVerticalOffsetValue={
+                          scrollViewVerticalOffsetValue
+                        }
                       />
                     );
                   })}

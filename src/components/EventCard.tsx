@@ -18,7 +18,14 @@ type EventCardPropsType = {
       }
     | undefined
   >;
-  scrollViewOffsetValue: SharedValue<number>;
+  scrollViewHorizontalOffsetValue: SharedValue<number>;
+  scrollViewVerticalOffsetValue: SharedValue<number>;
+  heightOfEachRow: {
+    [key: string]: {
+      y1: number;
+      y2: number;
+    };
+  };
 };
 
 const EventCard = (props: EventCardPropsType) => {
@@ -27,7 +34,9 @@ const EventCard = (props: EventCardPropsType) => {
     activeItem,
     activeItemPoistion,
     activeItemOverCell,
-    scrollViewOffsetValue,
+    scrollViewHorizontalOffsetValue,
+    heightOfEachRow,
+    scrollViewVerticalOffsetValue,
   } = props;
 
   const PanGesture = Gesture.Pan()
@@ -38,10 +47,21 @@ const EventCard = (props: EventCardPropsType) => {
         y: absoluteY,
       };
 
+      const row =
+        Object.keys(heightOfEachRow).find(
+          key =>
+            heightOfEachRow[key].y1 <
+              activeItemPoistion.value.y +
+                scrollViewVerticalOffsetValue.value &&
+            heightOfEachRow[key].y2 >
+              activeItemPoistion.value.y + scrollViewVerticalOffsetValue.value,
+        ) || 0;
+
       activeItemOverCell.value = {
-        row: 0,
+        row: +row,
         column: Math.floor(
-          (activeItemPoistion.value.x + scrollViewOffsetValue.value) / 150,
+          (activeItemPoistion.value.x + scrollViewHorizontalOffsetValue.value) /
+            150,
         ),
       };
     })
@@ -51,10 +71,22 @@ const EventCard = (props: EventCardPropsType) => {
         y: absoluteY + changeY,
       };
 
+      const row =
+        Object.keys(heightOfEachRow).find(
+          key =>
+            heightOfEachRow[key].y1 <
+              activeItemPoistion.value.y +
+                scrollViewVerticalOffsetValue.value &&
+            heightOfEachRow[key].y2 >
+              activeItemPoistion.value.y + scrollViewVerticalOffsetValue.value,
+        ) || 0;
+
+      console.log(row);
       activeItemOverCell.value = {
-        row: 0,
+        row: +row,
         column: Math.floor(
-          (activeItemPoistion.value.x + scrollViewOffsetValue.value) / 150,
+          (activeItemPoistion.value.x + scrollViewHorizontalOffsetValue.value) /
+            150,
         ),
       };
     })
