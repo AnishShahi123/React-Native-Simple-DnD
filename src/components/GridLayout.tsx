@@ -62,6 +62,14 @@ const GridLayout = () => {
     y: 0,
   });
 
+  const [activeItemOverCell, setActiveItemOverCell] = React.useState<
+    | undefined
+    | {
+        row: number;
+        column: number;
+      }
+  >(undefined);
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
@@ -73,8 +81,8 @@ const GridLayout = () => {
   });
 
   React.useEffect(() => {
-    console.log(activeItem);
-  }, [activeItem]);
+    console.log(activeItemOverCell);
+  }, [activeItemOverCell]);
 
   return (
     structuredData && (
@@ -82,6 +90,7 @@ const GridLayout = () => {
         {activeItem && (
           <Animated.View style={[animatedStyle, {zIndex: 100}]}>
             <EventCard
+              setActiveItemOverCell={setActiveItemOverCell}
               currentTask={convertedData?.collection[activeItem]}
               setActiveItem={setActiveItem}
               activeItemPoistion={activeItemPoistion}
@@ -113,6 +122,7 @@ const GridLayout = () => {
                     const currentCellTasksId = structuredData[currentGridId];
                     return (
                       <GridCell
+                        setActiveItemOverCell={setActiveItemOverCell}
                         setActiveItem={setActiveItem}
                         key={currentGridId}
                         currentCellTasksId={currentCellTasksId}

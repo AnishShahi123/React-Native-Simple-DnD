@@ -13,6 +13,15 @@ type PropTypes = {
     x: number;
     y: number;
   }>;
+  setActiveItemOverCell: React.Dispatch<
+    React.SetStateAction<
+      | {
+          row: number;
+          column: number;
+        }
+      | undefined
+    >
+  >;
 };
 
 export default function GridCell({
@@ -20,6 +29,7 @@ export default function GridCell({
   convertedData,
   currentGridId,
   setActiveItem,
+  setActiveItemOverCell,
   activeItemPoistion,
 }: PropTypes) {
   return (
@@ -38,6 +48,7 @@ export default function GridCell({
           const currentTask = convertedData?.collection[currentTaskId];
           return (
             <EventCard
+              setActiveItemOverCell={setActiveItemOverCell}
               currentTask={currentTask}
               key={currentTask?.id}
               setActiveItem={setActiveItem}

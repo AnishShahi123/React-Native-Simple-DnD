@@ -11,10 +11,24 @@ type EventCardPropsType = {
     x: number;
     y: number;
   }>;
+  setActiveItemOverCell: React.Dispatch<
+    React.SetStateAction<
+      | {
+          row: number;
+          column: number;
+        }
+      | undefined
+    >
+  >;
 };
 
 const EventCard = (props: EventCardPropsType) => {
-  const {currentTask, setActiveItem, activeItemPoistion} = props;
+  const {
+    currentTask,
+    setActiveItem,
+    activeItemPoistion,
+    setActiveItemOverCell,
+  } = props;
 
   const PanGesture = Gesture.Pan()
     .onBegin(({absoluteX, absoluteY}) => {
@@ -23,12 +37,26 @@ const EventCard = (props: EventCardPropsType) => {
         x: absoluteX,
         y: absoluteY,
       };
+
+      runOnJS(setActiveItemOverCell)(() => {
+        return {
+          row: 0,
+          column: Math.floor(activeItemPoistion.value.x / 200),
+        };
+      });
     })
     .onChange(({absoluteX, absoluteY, changeX, changeY}) => {
       activeItemPoistion.value = {
         x: absoluteX + changeX,
         y: absoluteY + changeY,
       };
+
+      runOnJS(setActiveItemOverCell)(() => {
+        return {
+          row: 0,
+          column: Math.floor(activeItemPoistion.value.x / 200),
+        };
+      });
     })
     .onFinalize(() => {
       runOnJS(setActiveItem)(undefined);
