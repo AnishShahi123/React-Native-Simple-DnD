@@ -81,7 +81,10 @@ const EventCard = (props: EventCardPropsType) => {
   const cardStyle = useAnimatedStyle(() => {
     if (isDragging) {
       return {
-        transform: [{translateX: 0}, {translateY: 0}],
+        transform: [
+          {translateX: activeItemPoistion.value.x},
+          {translateY: activeItemPoistion.value.y},
+        ],
         position: 'absolute',
       };
     }
