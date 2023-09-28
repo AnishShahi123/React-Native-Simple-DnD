@@ -8,29 +8,29 @@ type PropTypes = {
   currentCellTasksId: id[];
   convertedData: convertedDataType | null;
   currentGridId: string;
-  setActiveItem: React.Dispatch<React.SetStateAction<id | undefined>>;
+  activeItem: SharedValue<id | undefined>;
   activeItemPoistion: SharedValue<{
     x: number;
     y: number;
   }>;
-  setActiveItemOverCell: React.Dispatch<
-    React.SetStateAction<
-      | {
-          row: number;
-          column: number;
-        }
-      | undefined
-    >
+  activeItemOverCell: SharedValue<
+    | {
+        row: number;
+        column: number;
+      }
+    | undefined
   >;
+  scrollViewOffsetValue: SharedValue<number>;
 };
 
 export default function GridCell({
   currentCellTasksId,
   convertedData,
   currentGridId,
-  setActiveItem,
-  setActiveItemOverCell,
+  activeItem,
+  activeItemOverCell,
   activeItemPoistion,
+  scrollViewOffsetValue,
 }: PropTypes) {
   return (
     <View
@@ -48,11 +48,12 @@ export default function GridCell({
           const currentTask = convertedData?.collection[currentTaskId];
           return (
             <EventCard
-              setActiveItemOverCell={setActiveItemOverCell}
+              activeItemOverCell={activeItemOverCell}
               currentTask={currentTask}
               key={currentTask?.id}
-              setActiveItem={setActiveItem}
+              activeItem={activeItem}
               activeItemPoistion={activeItemPoistion}
+              scrollViewOffsetValue={scrollViewOffsetValue}
             />
           );
         })}

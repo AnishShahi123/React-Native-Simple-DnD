@@ -5,11 +5,11 @@ import {getStructuredData} from '../utils/getStructuredData';
 import {convertedDataType, id, structuredDataType} from '../utils/types';
 import {getWeekDates} from '../utils/getWeekDates';
 import {DateTime} from 'luxon';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 
 import GridCell from './GridCell';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import Animated, {
+  ZoomIn,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
@@ -48,7 +48,7 @@ const GridLayout = () => {
   }, [convertedData]);
 
   //active item contains the id of the task which is being dragged
-  const [activeItem, setActiveItem] = React.useState<undefined | id>(undefined);
+  const activeItem = useSharedValue<undefined | id>(undefined);
 
   const [heightOfEachRow, setHeightOfEachRow] = React.useState<{
     [key: string]: {
@@ -62,13 +62,15 @@ const GridLayout = () => {
     y: 0,
   });
 
-  const [activeItemOverCell, setActiveItemOverCell] = React.useState<
+  const activeItemOverCell = useSharedValue<
     | undefined
     | {
         row: number;
         column: number;
       }
   >(undefined);
+
+  const scrollViewOffsetValue = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -80,24 +82,27 @@ const GridLayout = () => {
     };
   });
 
-  React.useEffect(() => {
-    console.log(activeItemOverCell);
-  }, [activeItemOverCell]);
-
   return (
     structuredData && (
       <>
-        {activeItem && (
-          <Animated.View style={[animatedStyle, {zIndex: 100}]}>
+        {activeItem.value && (
+          <Animated.View
+            style={[animatedStyle, {zIndex: 100}]}
+            entering={ZoomIn.springify()}>
             <EventCard
-              setActiveItemOverCell={setActiveItemOverCell}
-              currentTask={convertedData?.collection[activeItem]}
-              setActiveItem={setActiveItem}
+              activeItem={activeItem}
+              activeItemOverCell={activeItemOverCell}
+              currentTask={convertedData?.collection[activeItem.value]}
               activeItemPoistion={activeItemPoistion}
+              scrollViewOffsetValue={scrollViewOffsetValue}
             />
           </Animated.View>
         )}
-        <ScrollView horizontal>
+        <ScrollView
+          horizontal
+          onScroll={event => {
+            scrollViewOffsetValue.value = event.nativeEvent.contentOffset.x;
+          }}>
           <ScrollView>
             {Array.from({length: 5}).map((item, index) => {
               return (
@@ -122,13 +127,14 @@ const GridLayout = () => {
                     const currentCellTasksId = structuredData[currentGridId];
                     return (
                       <GridCell
-                        setActiveItemOverCell={setActiveItemOverCell}
-                        setActiveItem={setActiveItem}
+                        activeItemOverCell={activeItemOverCell}
                         key={currentGridId}
                         currentCellTasksId={currentCellTasksId}
                         convertedData={convertedData}
                         currentGridId={currentGridId}
                         activeItemPoistion={activeItemPoistion}
+                        activeItem={activeItem}
+                        scrollViewOffsetValue={scrollViewOffsetValue}
                       />
                     );
                   })}
