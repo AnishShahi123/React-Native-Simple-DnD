@@ -48,6 +48,7 @@ type EventCardPropsType = {
     timestamp: number;
     title: string;
   }[];
+  setTitle: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 const EventCard = (props: EventCardPropsType) => {
@@ -63,6 +64,7 @@ const EventCard = (props: EventCardPropsType) => {
     setConvertedData,
     setDataToRender,
     dataToRender,
+    setTitle,
   } = props;
 
   const PanGesture = Gesture.Pan()
@@ -72,7 +74,7 @@ const EventCard = (props: EventCardPropsType) => {
         x: absoluteX,
         y: absoluteY,
       };
-
+      runOnJS(setTitle)(currentTask?.title);
       const row =
         Object.keys(heightOfEachRow).find(
           key =>
@@ -117,7 +119,7 @@ const EventCard = (props: EventCardPropsType) => {
     })
     .onFinalize(() => {
       runOnJS(getNewTimestamp)();
-
+      runOnJS(setTitle)(undefined);
       console.log(activeItem.value);
       console.log(activeItemOverCell.value);
     });

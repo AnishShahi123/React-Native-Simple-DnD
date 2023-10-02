@@ -5,13 +5,12 @@ import {getStructuredData} from '../utils/getStructuredData';
 import {convertedDataType, id, structuredDataType} from '../utils/types';
 import {getWeekDates} from '../utils/getWeekDates';
 import {DateTime} from 'luxon';
-import {ScrollView, View} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 import GridCell from './GridCell';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
-import EventCard from './EventCard';
 
 const GridLayout = () => {
   const [convertedData, setConvertedData] =
@@ -89,12 +88,17 @@ const GridLayout = () => {
     console.log(activeItem.value);
   }, [activeItem.value]);
 
+  const [title, setTitle] = React.useState<string | undefined>(undefined);
+
   return (
     structuredData && (
       <>
-        {activeItem.value && (
+        {title && (
           <Animated.View style={[animatedStyle, {zIndex: 100}]}>
-            <EventCard
+            <View style={{backgroundColor: 'red', width: 150}}>
+              <Text>{title}</Text>
+            </View>
+            {/* <EventCard
               activeItem={activeItem}
               activeItemOverCell={activeItemOverCell}
               currentTask={convertedData?.collection[activeItem.value]}
@@ -106,7 +110,7 @@ const GridLayout = () => {
               setConvertedData={setConvertedData}
               dataToRender={dataToRender}
               setDataToRender={setDataToRender}
-            />
+            /> */}
           </Animated.View>
         )}
         <ScrollView
@@ -120,7 +124,7 @@ const GridLayout = () => {
               scrollViewVerticalOffsetValue.value =
                 event.nativeEvent.contentOffset.y;
             }}>
-            {Array.from({length: 5}).map((item, index) => {
+            {Array.from({length: 10}).map((item, index) => {
               return (
                 <View
                   style={{flexDirection: 'row'}}
@@ -161,6 +165,7 @@ const GridLayout = () => {
                         setConvertedData={setConvertedData}
                         dataToRender={dataToRender}
                         setDataToRender={setDataToRender}
+                        setTitle={setTitle}
                       />
                     );
                   })}

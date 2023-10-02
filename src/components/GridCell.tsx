@@ -47,6 +47,7 @@ type PropTypes = {
     timestamp: number;
     title: string;
   }[];
+  setTitle: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 export default function GridCell({
@@ -63,6 +64,7 @@ export default function GridCell({
   setConvertedData,
   setDataToRender,
   dataToRender,
+  setTitle,
 }: PropTypes) {
   return (
     <View
@@ -91,6 +93,7 @@ export default function GridCell({
               setConvertedData={setConvertedData}
               dataToRender={dataToRender}
               setDataToRender={setDataToRender}
+              setTitle={setTitle}
             />
           );
         })}
