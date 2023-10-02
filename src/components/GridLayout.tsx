@@ -6,10 +6,8 @@ import {convertedDataType, id, structuredDataType} from '../utils/types';
 import {getWeekDates} from '../utils/getWeekDates';
 import {DateTime} from 'luxon';
 import {ScrollView, View} from 'react-native';
-
 import GridCell from './GridCell';
 import Animated, {
-  ZoomIn,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
@@ -24,9 +22,13 @@ const GridLayout = () => {
     Array<DateTime>
   >([]);
 
+  const [dataToRender, setDataToRender] = React.useState(MOCK_DATA);
+
   React.useEffect(() => {
     async function initialMethods() {
-      const {collection, ids} = await convertDataToIdsAndCollection(MOCK_DATA);
+      const {collection, ids} = await convertDataToIdsAndCollection(
+        dataToRender,
+      );
       setConvertedData({ids, collection});
 
       const response = await getStructuredData({ids, collection});
@@ -84,16 +86,14 @@ const GridLayout = () => {
   });
 
   React.useEffect(() => {
-    console.log(heightOfEachRow);
-  }, [heightOfEachRow]);
+    console.log(activeItem.value);
+  }, [activeItem.value]);
 
   return (
     structuredData && (
       <>
         {activeItem.value && (
-          <Animated.View
-            style={[animatedStyle, {zIndex: 100}]}
-            entering={ZoomIn.springify()}>
+          <Animated.View style={[animatedStyle, {zIndex: 100}]}>
             <EventCard
               activeItem={activeItem}
               activeItemOverCell={activeItemOverCell}
@@ -104,6 +104,8 @@ const GridLayout = () => {
               scrollViewVerticalOffsetValue={scrollViewVerticalOffsetValue}
               getWeekDatesData={getWeekDatesData}
               setConvertedData={setConvertedData}
+              dataToRender={dataToRender}
+              setDataToRender={setDataToRender}
             />
           </Animated.View>
         )}
@@ -157,6 +159,8 @@ const GridLayout = () => {
                         }
                         getWeekDatesData={getWeekDatesData}
                         setConvertedData={setConvertedData}
+                        dataToRender={dataToRender}
+                        setDataToRender={setDataToRender}
                       />
                     );
                   })}

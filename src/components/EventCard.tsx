@@ -4,6 +4,9 @@ import {convertedDataType, data, id} from '../utils/types';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {SharedValue, runOnJS} from 'react-native-reanimated';
 import {DateTime} from 'luxon';
+import MOCK_DATA from '../mockData/MOCK_DATA.json';
+import {convertDataToIdsAndCollection} from '../utils/convertDataToIdAndCollection';
+import {getWeekDates} from '../utils/getWeekDates';
 
 type EventCardPropsType = {
   currentTask: data | undefined;
@@ -31,6 +34,20 @@ type EventCardPropsType = {
   setConvertedData: React.Dispatch<
     React.SetStateAction<convertedDataType | null>
   >;
+  setDataToRender: React.Dispatch<
+    React.SetStateAction<
+      {
+        id: number;
+        timestamp: number;
+        title: string;
+      }[]
+    >
+  >;
+  dataToRender: {
+    id: number;
+    timestamp: number;
+    title: string;
+  }[];
 };
 
 const EventCard = (props: EventCardPropsType) => {
@@ -44,6 +61,8 @@ const EventCard = (props: EventCardPropsType) => {
     scrollViewVerticalOffsetValue,
     getWeekDatesData,
     setConvertedData,
+    setDataToRender,
+    dataToRender,
   } = props;
 
   const PanGesture = Gesture.Pan()
@@ -96,11 +115,10 @@ const EventCard = (props: EventCardPropsType) => {
         ),
       };
     })
-
     .onFinalize(() => {
-      if (!activeItemOverCell.value || !activeItem) return;
+      runOnJS(getNewTimestamp)();
 
-      activeItem.value = undefined;
+      console.log(activeItem.value);
       console.log(activeItemOverCell.value);
     });
 
@@ -121,6 +139,34 @@ const EventCard = (props: EventCardPropsType) => {
       </GestureDetector>
     )
   );
+
+  function getNewTimestamp() {
+    if (!activeItemOverCell.value || !activeItem.value) return;
+    console.log(getWeekDatesData);
+    const newDate = getWeekDatesData[+activeItemOverCell.value.column];
+
+    const newTimeStamp = newDate
+      .plus({hours: activeItemOverCell.value.row})
+      .toSeconds();
+
+    const newData = dataToRender.map(data => {
+      if (data.id !== activeItem.value) {
+        return data;
+      } else {
+        return {
+          ...data,
+          timestamp: newTimeStamp,
+        };
+      }
+    });
+
+    setDataToRender(newData);
+
+    convertDataToIdsAndCollection(newData).then(({ids, collection}) => {
+      setConvertedData({ids, collection});
+    });
+    activeItem.value = undefined;
+  }
 };
 
 export default EventCard;
