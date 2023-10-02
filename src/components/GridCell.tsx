@@ -3,6 +3,7 @@ import React from 'react';
 import {convertedDataType, id} from '../utils/types';
 import EventCard from './EventCard';
 import {SharedValue} from 'react-native-reanimated';
+import {DateTime} from 'luxon';
 
 type PropTypes = {
   currentCellTasksId: id[];
@@ -28,18 +29,24 @@ type PropTypes = {
       y2: number;
     };
   };
+  getWeekDatesData: DateTime[];
+  setConvertedData: React.Dispatch<
+    React.SetStateAction<convertedDataType | null>
+  >;
 };
 
 export default function GridCell({
   currentCellTasksId,
   convertedData,
-  currentGridId,
+  // currentGridId,
   activeItem,
   activeItemOverCell,
   activeItemPoistion,
   scrollViewHorizontalOffsetValue,
   heightOfEachRow,
   scrollViewVerticalOffsetValue,
+  getWeekDatesData,
+  setConvertedData,
 }: PropTypes) {
   return (
     <View
@@ -64,6 +71,8 @@ export default function GridCell({
               scrollViewHorizontalOffsetValue={scrollViewHorizontalOffsetValue}
               heightOfEachRow={heightOfEachRow}
               scrollViewVerticalOffsetValue={scrollViewVerticalOffsetValue}
+              getWeekDatesData={getWeekDatesData}
+              setConvertedData={setConvertedData}
             />
           );
         })}

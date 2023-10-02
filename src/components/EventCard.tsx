@@ -1,8 +1,9 @@
 import React from 'react';
 import {Text, View} from 'react-native';
-import {data, id} from '../utils/types';
+import {convertedDataType, data, id} from '../utils/types';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {SharedValue} from 'react-native-reanimated';
+import {SharedValue, runOnJS} from 'react-native-reanimated';
+import {DateTime} from 'luxon';
 
 type EventCardPropsType = {
   currentTask: data | undefined;
@@ -26,6 +27,10 @@ type EventCardPropsType = {
       y2: number;
     };
   };
+  getWeekDatesData: DateTime[];
+  setConvertedData: React.Dispatch<
+    React.SetStateAction<convertedDataType | null>
+  >;
 };
 
 const EventCard = (props: EventCardPropsType) => {
@@ -37,6 +42,8 @@ const EventCard = (props: EventCardPropsType) => {
     scrollViewHorizontalOffsetValue,
     heightOfEachRow,
     scrollViewVerticalOffsetValue,
+    getWeekDatesData,
+    setConvertedData,
   } = props;
 
   const PanGesture = Gesture.Pan()
@@ -81,7 +88,6 @@ const EventCard = (props: EventCardPropsType) => {
               activeItemPoistion.value.y + scrollViewVerticalOffsetValue.value,
         ) || 0;
 
-      console.log(row);
       activeItemOverCell.value = {
         row: +row,
         column: Math.floor(
@@ -92,6 +98,8 @@ const EventCard = (props: EventCardPropsType) => {
     })
 
     .onFinalize(() => {
+      if (!activeItemOverCell.value || !activeItem) return;
+
       activeItem.value = undefined;
       console.log(activeItemOverCell.value);
     });

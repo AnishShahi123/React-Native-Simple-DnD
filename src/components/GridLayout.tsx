@@ -102,6 +102,8 @@ const GridLayout = () => {
               scrollViewHorizontalOffsetValue={scrollViewHorizontalOffsetValue}
               heightOfEachRow={heightOfEachRow}
               scrollViewVerticalOffsetValue={scrollViewVerticalOffsetValue}
+              getWeekDatesData={getWeekDatesData}
+              setConvertedData={setConvertedData}
             />
           </Animated.View>
         )}
@@ -153,6 +155,8 @@ const GridLayout = () => {
                         scrollViewVerticalOffsetValue={
                           scrollViewVerticalOffsetValue
                         }
+                        getWeekDatesData={getWeekDatesData}
+                        setConvertedData={setConvertedData}
                       />
                     );
                   })}
