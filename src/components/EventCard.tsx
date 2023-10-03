@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, ScrollView} from 'react-native';
 import {convertedDataType, data, id} from '../utils/types';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
 import {SharedValue, runOnJS} from 'react-native-reanimated';
@@ -7,7 +7,6 @@ import {DateTime} from 'luxon';
 import MOCK_DATA from '../mockData/MOCK_DATA.json';
 import {convertDataToIdsAndCollection} from '../utils/convertDataToIdAndCollection';
 import {getWeekDates} from '../utils/getWeekDates';
-import {produce} from 'immer';
 
 type EventCardPropsType = {
   currentTask: data | undefined;
@@ -38,6 +37,9 @@ type EventCardPropsType = {
 
   setTitle: React.Dispatch<React.SetStateAction<string | undefined>>;
   convertedData: convertedDataType | null;
+  horizontalScrolViewRef: React.MutableRefObject<ScrollView | null>;
+  verticalScrolViewRef: React.MutableRefObject<ScrollView | null>;
+  heightOfScrollView: SharedValue<number>;
 };
 
 const EventCard = (props: EventCardPropsType) => {
@@ -53,10 +55,14 @@ const EventCard = (props: EventCardPropsType) => {
     setConvertedData,
     convertedData,
     setTitle,
+    horizontalScrolViewRef,
+    verticalScrolViewRef,
+    heightOfScrollView,
   } = props;
 
   const PanGesture = Gesture.Pan()
     .onBegin(({absoluteX, absoluteY}) => {
+      console.log(absoluteX);
       activeItem.value = currentTask?.id;
       activeItemPoistion.value = {
         x: absoluteX,
@@ -87,6 +93,35 @@ const EventCard = (props: EventCardPropsType) => {
         y: absoluteY + changeY,
       };
 
+      console.log('X:', activeItemPoistion.value.y);
+
+      // for horizontal auto scroll
+      if (
+        activeItemPoistion.value.x > 380 &&
+        absoluteX + scrollViewHorizontalOffsetValue.value < 1100
+      ) {
+        runOnJS(scrollHorizontally)(absoluteX);
+      }
+
+      if (
+        activeItemPoistion.value.x < 20 &&
+        absoluteX + scrollViewHorizontalOffsetValue.value > 0
+      ) {
+        runOnJS(scrollHorizontallyToLeft)(absoluteX);
+      }
+
+      // for vertical auto scroll
+      if (activeItemPoistion.value.y > 750) {
+        runOnJS(scrollVerticallyToDown)(absoluteY);
+      }
+
+      if (
+        activeItemPoistion.value.y < 250 &&
+        absoluteX + scrollViewVerticalOffsetValue.value > 0
+      ) {
+        runOnJS(scrollVerticallyToUp)(absoluteY);
+      }
+
       const row =
         Object.keys(heightOfEachRow).find(
           key =>
@@ -108,8 +143,6 @@ const EventCard = (props: EventCardPropsType) => {
     .onFinalize(() => {
       runOnJS(getNewTimestamp)();
       runOnJS(setTitle)(undefined);
-      console.log(activeItem.value);
-      console.log(activeItemOverCell.value);
     });
 
   return (
@@ -132,7 +165,7 @@ const EventCard = (props: EventCardPropsType) => {
 
   function getNewTimestamp() {
     if (!activeItemOverCell.value || !activeItem.value) return;
-    console.log(getWeekDatesData);
+
     const newDate = getWeekDatesData[+activeItemOverCell.value.column];
 
     const newTimeStamp = newDate
@@ -159,32 +192,45 @@ const EventCard = (props: EventCardPropsType) => {
     };
 
     setConvertedData(tempData);
-    // setConvertedData(
-    //   produce(draft => {
-    //     if (activeItem.value) {
-    //       const dataObj = draft?.collection[activeItem.value];
-    //       dataObj?.timestamp = newTimeStamp;
-    //     }
-    //   }),
-    // );
-
-    // const newData = dataToRender.map(data => {
-    //   if (data.id !== activeItem.value) {
-    //     return data;
-    //   } else {
-    //     return {
-    //       ...data,
-    //       timestamp: newTimeStamp,
-    //     };
-    //   }
-    // });
-
-    // setDataToRender(newData);
-
-    // convertDataToIdsAndCollection(newData).then(({ids, collection}) => {
-    //   setConvertedData({ids, collection});
-    // });
     activeItem.value = undefined;
+  }
+
+  function scrollHorizontally(absoluteX) {
+    horizontalScrolViewRef.current?.scrollTo({
+      x: absoluteX + scrollViewHorizontalOffsetValue.value + 100,
+      y: 0,
+      animated: true,
+    });
+  }
+
+  function scrollHorizontallyToLeft(absoluteX) {
+    horizontalScrolViewRef.current?.scrollTo({
+      x:
+        absoluteX + scrollViewHorizontalOffsetValue.value - 100 < 0
+          ? 0
+          : absoluteX + scrollViewHorizontalOffsetValue.value - 100,
+      y: 0,
+      animated: true,
+    });
+  }
+
+  function scrollVerticallyToUp(absoluteY) {
+    verticalScrolViewRef.current?.scrollTo({
+      x: 0,
+      y:
+        absoluteY + scrollViewVerticalOffsetValue.value - 100 < 0
+          ? 0
+          : absoluteY + scrollViewVerticalOffsetValue.value - 100,
+      animated: true,
+    });
+  }
+
+  function scrollVerticallyToDown(absoluteY) {
+    verticalScrolViewRef.current?.scrollTo({
+      x: 0,
+      y: absoluteY + scrollViewVerticalOffsetValue.value + 100,
+      animated: true,
+    });
   }
 };
 

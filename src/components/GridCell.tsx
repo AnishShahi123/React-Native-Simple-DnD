@@ -1,4 +1,4 @@
-import {View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import React from 'react';
 import {convertedDataType, id} from '../utils/types';
 import EventCard from './EventCard';
@@ -34,6 +34,9 @@ type PropTypes = {
     React.SetStateAction<convertedDataType | null>
   >;
   setTitle: React.Dispatch<React.SetStateAction<string | undefined>>;
+  horizontalScrolViewRef: React.MutableRefObject<ScrollView | null>;
+  verticalScrolViewRef: React.MutableRefObject<ScrollView | null>;
+  heightOfScrollView: SharedValue<number>;
 };
 
 export default function GridCell({
@@ -48,8 +51,10 @@ export default function GridCell({
   scrollViewVerticalOffsetValue,
   getWeekDatesData,
   setConvertedData,
-
+  horizontalScrolViewRef,
   setTitle,
+  verticalScrolViewRef,
+  heightOfScrollView,
 }: PropTypes) {
   return (
     <View
@@ -78,6 +83,9 @@ export default function GridCell({
               setConvertedData={setConvertedData}
               setTitle={setTitle}
               convertedData={convertedData}
+              horizontalScrolViewRef={horizontalScrolViewRef}
+              verticalScrolViewRef={verticalScrolViewRef}
+              heightOfScrollView={heightOfScrollView}
             />
           );
         })}

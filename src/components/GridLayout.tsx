@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {convertDataToIdsAndCollection} from '../utils/convertDataToIdAndCollection';
 import MOCK_DATA from '../mockData/MOCK_DATA.json';
 import {getStructuredData} from '../utils/getStructuredData';
@@ -24,7 +24,6 @@ const GridLayout = () => {
   React.useEffect(() => {
     async function initialMethods() {
       const {collection, ids} = await convertDataToIdsAndCollection(MOCK_DATA);
-      console.log(convertedData);
       setConvertedData({ids, collection});
 
       const response = await getStructuredData({ids, collection});
@@ -81,11 +80,16 @@ const GridLayout = () => {
     };
   });
 
-  React.useEffect(() => {
-    console.log(activeItem.value);
-  }, [activeItem.value]);
+  // React.useEffect(() => {
+  //   console.log(activeItem.value);
+  // }, [activeItem.value]);
 
   const [title, setTitle] = React.useState<string | undefined>(undefined);
+
+  const horizontalScrolViewRef = useRef<ScrollView | null>(null);
+  const verticalScrolViewRef = useRef<ScrollView | null>(null);
+
+  const heightOfScrollView = useSharedValue(0);
 
   return (
     structuredData && (
@@ -115,13 +119,18 @@ const GridLayout = () => {
           onScroll={event => {
             scrollViewHorizontalOffsetValue.value =
               event.nativeEvent.contentOffset.x;
-          }}>
+          }}
+          ref={horizontalScrolViewRef}>
           <ScrollView
+            ref={verticalScrolViewRef}
+            onLayout={({nativeEvent}) => {
+              heightOfScrollView.value = nativeEvent.layout.height;
+            }}
             onScroll={event => {
               scrollViewVerticalOffsetValue.value =
                 event.nativeEvent.contentOffset.y;
             }}>
-            {Array.from({length: 2}).map((item, index) => {
+            {Array.from({length: 10}).map((item, index) => {
               return (
                 <View
                   style={{flexDirection: 'row'}}
@@ -161,6 +170,9 @@ const GridLayout = () => {
                         getWeekDatesData={getWeekDatesData}
                         setConvertedData={setConvertedData}
                         setTitle={setTitle}
+                        horizontalScrolViewRef={horizontalScrolViewRef}
+                        verticalScrolViewRef={verticalScrolViewRef}
+                        heightOfScrollView={heightOfScrollView}
                       />
                     );
                   })}
