@@ -33,20 +33,6 @@ type PropTypes = {
   setConvertedData: React.Dispatch<
     React.SetStateAction<convertedDataType | null>
   >;
-  setDataToRender: React.Dispatch<
-    React.SetStateAction<
-      {
-        id: number;
-        timestamp: number;
-        title: string;
-      }[]
-    >
-  >;
-  dataToRender: {
-    id: number;
-    timestamp: number;
-    title: string;
-  }[];
   setTitle: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
@@ -62,8 +48,7 @@ export default function GridCell({
   scrollViewVerticalOffsetValue,
   getWeekDatesData,
   setConvertedData,
-  setDataToRender,
-  dataToRender,
+
   setTitle,
 }: PropTypes) {
   return (
@@ -91,9 +76,8 @@ export default function GridCell({
               scrollViewVerticalOffsetValue={scrollViewVerticalOffsetValue}
               getWeekDatesData={getWeekDatesData}
               setConvertedData={setConvertedData}
-              dataToRender={dataToRender}
-              setDataToRender={setDataToRender}
               setTitle={setTitle}
+              convertedData={convertedData}
             />
           );
         })}

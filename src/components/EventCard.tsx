@@ -7,6 +7,7 @@ import {DateTime} from 'luxon';
 import MOCK_DATA from '../mockData/MOCK_DATA.json';
 import {convertDataToIdsAndCollection} from '../utils/convertDataToIdAndCollection';
 import {getWeekDates} from '../utils/getWeekDates';
+import {produce} from 'immer';
 
 type EventCardPropsType = {
   currentTask: data | undefined;
@@ -34,21 +35,9 @@ type EventCardPropsType = {
   setConvertedData: React.Dispatch<
     React.SetStateAction<convertedDataType | null>
   >;
-  setDataToRender: React.Dispatch<
-    React.SetStateAction<
-      {
-        id: number;
-        timestamp: number;
-        title: string;
-      }[]
-    >
-  >;
-  dataToRender: {
-    id: number;
-    timestamp: number;
-    title: string;
-  }[];
+
   setTitle: React.Dispatch<React.SetStateAction<string | undefined>>;
+  convertedData: convertedDataType | null;
 };
 
 const EventCard = (props: EventCardPropsType) => {
@@ -62,8 +51,7 @@ const EventCard = (props: EventCardPropsType) => {
     scrollViewVerticalOffsetValue,
     getWeekDatesData,
     setConvertedData,
-    setDataToRender,
-    dataToRender,
+    convertedData,
     setTitle,
   } = props;
 
@@ -151,22 +139,51 @@ const EventCard = (props: EventCardPropsType) => {
       .plus({hours: activeItemOverCell.value.row})
       .toSeconds();
 
-    const newData = dataToRender.map(data => {
-      if (data.id !== activeItem.value) {
-        return data;
-      } else {
-        return {
-          ...data,
-          timestamp: newTimeStamp,
-        };
-      }
-    });
+    let tempData = convertedData;
+    let tempObj = convertedData?.collection[activeItem.value];
+    if (!tempData || !tempObj) return;
+    tempObj = {
+      ...tempObj,
+      timestamp: newTimeStamp,
+      containerId: `${DateTime.fromSeconds(newTimeStamp).day}-${
+        DateTime.fromSeconds(newTimeStamp).hour
+      }`,
+    };
 
-    setDataToRender(newData);
+    tempData = {
+      ids: tempData.ids,
+      collection: {
+        ...tempData.collection,
+        [activeItem.value]: tempObj,
+      },
+    };
 
-    convertDataToIdsAndCollection(newData).then(({ids, collection}) => {
-      setConvertedData({ids, collection});
-    });
+    setConvertedData(tempData);
+    // setConvertedData(
+    //   produce(draft => {
+    //     if (activeItem.value) {
+    //       const dataObj = draft?.collection[activeItem.value];
+    //       dataObj?.timestamp = newTimeStamp;
+    //     }
+    //   }),
+    // );
+
+    // const newData = dataToRender.map(data => {
+    //   if (data.id !== activeItem.value) {
+    //     return data;
+    //   } else {
+    //     return {
+    //       ...data,
+    //       timestamp: newTimeStamp,
+    //     };
+    //   }
+    // });
+
+    // setDataToRender(newData);
+
+    // convertDataToIdsAndCollection(newData).then(({ids, collection}) => {
+    //   setConvertedData({ids, collection});
+    // });
     activeItem.value = undefined;
   }
 };

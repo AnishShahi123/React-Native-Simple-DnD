@@ -21,13 +21,10 @@ const GridLayout = () => {
     Array<DateTime>
   >([]);
 
-  const [dataToRender, setDataToRender] = React.useState(MOCK_DATA);
-
   React.useEffect(() => {
     async function initialMethods() {
-      const {collection, ids} = await convertDataToIdsAndCollection(
-        dataToRender,
-      );
+      const {collection, ids} = await convertDataToIdsAndCollection(MOCK_DATA);
+      console.log(convertedData);
       setConvertedData({ids, collection});
 
       const response = await getStructuredData({ids, collection});
@@ -124,7 +121,7 @@ const GridLayout = () => {
               scrollViewVerticalOffsetValue.value =
                 event.nativeEvent.contentOffset.y;
             }}>
-            {Array.from({length: 10}).map((item, index) => {
+            {Array.from({length: 2}).map((item, index) => {
               return (
                 <View
                   style={{flexDirection: 'row'}}
@@ -163,8 +160,6 @@ const GridLayout = () => {
                         }
                         getWeekDatesData={getWeekDatesData}
                         setConvertedData={setConvertedData}
-                        dataToRender={dataToRender}
-                        setDataToRender={setDataToRender}
                         setTitle={setTitle}
                       />
                     );
