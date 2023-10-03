@@ -2,7 +2,11 @@ import React from 'react';
 import {Text, View, ScrollView} from 'react-native';
 import {convertedDataType, data, id} from '../utils/types';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import {SharedValue, runOnJS} from 'react-native-reanimated';
+import Animated, {
+  SharedValue,
+  runOnJS,
+  useAnimatedStyle,
+} from 'react-native-reanimated';
 import {DateTime} from 'luxon';
 import MOCK_DATA from '../mockData/MOCK_DATA.json';
 import {convertDataToIdsAndCollection} from '../utils/convertDataToIdAndCollection';
@@ -57,12 +61,10 @@ const EventCard = (props: EventCardPropsType) => {
     setTitle,
     horizontalScrolViewRef,
     verticalScrolViewRef,
-    heightOfScrollView,
   } = props;
 
   const PanGesture = Gesture.Pan()
     .onBegin(({absoluteX, absoluteY}) => {
-      console.log(absoluteX);
       activeItem.value = currentTask?.id;
       activeItemPoistion.value = {
         x: absoluteX,
@@ -92,8 +94,6 @@ const EventCard = (props: EventCardPropsType) => {
         x: absoluteX + changeX,
         y: absoluteY + changeY,
       };
-
-      console.log('X:', activeItemPoistion.value.y);
 
       // for horizontal auto scroll
       if (
@@ -148,7 +148,11 @@ const EventCard = (props: EventCardPropsType) => {
   return (
     currentTask && (
       <GestureDetector gesture={PanGesture}>
-        <View id={currentTask?.id.toString()}>
+        <Animated.View
+          id={currentTask?.id.toString()}
+          style={
+            currentTask.id === activeItem.value ? {transform: [{scale: 0}]} : {}
+          }>
           <View
             key={currentTask?.id}
             style={{
@@ -158,7 +162,7 @@ const EventCard = (props: EventCardPropsType) => {
             }}>
             <Text>{currentTask?.title}</Text>
           </View>
-        </View>
+        </Animated.View>
       </GestureDetector>
     )
   );

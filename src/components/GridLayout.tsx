@@ -99,19 +99,6 @@ const GridLayout = () => {
             <View style={{backgroundColor: 'red', width: 150}}>
               <Text>{title}</Text>
             </View>
-            {/* <EventCard
-              activeItem={activeItem}
-              activeItemOverCell={activeItemOverCell}
-              currentTask={convertedData?.collection[activeItem.value]}
-              activeItemPoistion={activeItemPoistion}
-              scrollViewHorizontalOffsetValue={scrollViewHorizontalOffsetValue}
-              heightOfEachRow={heightOfEachRow}
-              scrollViewVerticalOffsetValue={scrollViewVerticalOffsetValue}
-              getWeekDatesData={getWeekDatesData}
-              setConvertedData={setConvertedData}
-              dataToRender={dataToRender}
-              setDataToRender={setDataToRender}
-            /> */}
           </Animated.View>
         )}
         <ScrollView
@@ -130,7 +117,7 @@ const GridLayout = () => {
               scrollViewVerticalOffsetValue.value =
                 event.nativeEvent.contentOffset.y;
             }}>
-            {Array.from({length: 10}).map((item, index) => {
+            {Array.from({length: 2}).map((item, index) => {
               return (
                 <View
                   style={{flexDirection: 'row'}}
